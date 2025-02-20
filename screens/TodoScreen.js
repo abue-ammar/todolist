@@ -1,19 +1,25 @@
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useNavigation } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 const TodoScreen = () => {
   const [todos, setTodos] = useState([]);
-  const navigation = useNavigation();
+  const [todoText, setTodoText] = useState("");
+  const bottomSheetRef = useRef(null);
+  const snapPoints = ["20%", "40%"];
 
   // Load todos from storage when component mounts
   useEffect(() => {
@@ -44,14 +50,16 @@ const TodoScreen = () => {
     }
   };
 
-  const addTodo = (newTodoTitle) => {
-    if (newTodoTitle.trim()) {
+  const addTodo = () => {
+    if (todoText.trim()) {
       const newTodo = {
         id: Date.now().toString(),
-        title: newTodoTitle,
+        title: todoText,
         completed: false,
       };
       setTodos([...todos, newTodo]);
+      setTodoText("");
+      bottomSheetRef.current?.close();
     }
   };
 
@@ -63,11 +71,11 @@ const TodoScreen = () => {
     );
   };
 
-  const renderItem = ({ item , index}) => (
+  const renderItem = ({ item, index }) => (
     <TouchableOpacity
       style={[
         styles.todoItem,
-        index === todos.length - 1 && styles.lastTodoItem, // Remove border for last item
+        index === todos.length - 1 && styles.lastTodoItem,
       ]}
       onPress={() => toggleTodo(item.id)}
     >
@@ -84,7 +92,6 @@ const TodoScreen = () => {
     const date = new Date();
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
-    // return `${day} ${month}`;
     return (
       <View style={styles.dateContainer}>
         <Text style={styles.dateText}>{day}</Text>
@@ -93,6 +100,16 @@ const TodoScreen = () => {
     );
   };
 
+  const renderBackdrop = useCallback(
+    (props) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+      />
+    ),
+    []
+  );
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -119,10 +136,39 @@ const TodoScreen = () => {
         />
         <TouchableOpacity
           style={styles.addButton}
-          onPress={() => navigation.navigate("AddTodo", { addTodo })}
+          onPress={() => bottomSheetRef.current?.expand()}
         >
-          <Feather name="plus" size={32} color="white" />
+          <Feather name="plus" size={40} color="white" />
         </TouchableOpacity>
+        {/* Bottom Sheet */}
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1}
+          snapPoints={snapPoints}
+          enablePanDownToClose
+          backdropComponent={renderBackdrop}
+          keyboardBehavior="extend"
+          handleStyle={styles.handle} // Add handle styling
+          backgroundStyle={styles.background}
+          handleIndicatorStyle={styles.handleIndicator}
+        >
+          <BottomSheetView style={styles.bottomSheetContent}>
+            <Text style={styles.bottomSheetTitle}>New Task</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter new todo..."
+              value={todoText}
+              onChangeText={setTodoText}
+              autoFocus
+            />
+            <TouchableOpacity
+              style={styles.bottomSheetButton}
+              onPress={addTodo}
+            >
+              <Text style={styles.bottomSheetButtonText}>Add Task</Text>
+            </TouchableOpacity>
+          </BottomSheetView>
+        </BottomSheet>
       </View>
     </SafeAreaView>
   );
@@ -155,7 +201,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 30, // Increased padding for better spacing
+    paddingTop: 30,
     backgroundColor: "white",
   },
   headerContainer: {
@@ -210,10 +256,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     right: 20,
-    width: 60, // Increased size
-    height: 60, // Increased size
+    width: 70, // Increased size
+    height: 70, // Increased size
     backgroundColor: "black",
-    borderRadius: 30,
+    borderRadius: 35,
     justifyContent: "center",
     alignItems: "center",
     shadowColor: "#000",
@@ -227,6 +273,53 @@ const styles = StyleSheet.create({
     color: "gray",
     textAlign: "center",
     marginTop: 20,
+  },
+  bottomSheetContent: {
+    flex: 1,
+    padding: 20,
+  },
+  bottomSheetTitle: {
+    fontSize: 24,
+    fontWeight: "800",
+    marginBottom: 12,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    fontSize: 16,
+  },
+  bottomSheetButton: {
+    backgroundColor: "black",
+    padding: 16,
+    borderRadius: 12,
+    alignItems: "center",
+  },
+  bottomSheetButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  handle: {
+    backgroundColor: "white",
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+  },
+  background: {
+    backgroundColor: "white",
+    borderRadius: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: -4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 10,
+  },
+  handleIndicator: {
+    backgroundColor: "#ddd",
+    width: 80,
+    height: 8,
   },
 });
 

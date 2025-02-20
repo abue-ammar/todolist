@@ -9,6 +9,7 @@ import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
+  Keyboard,
   StyleSheet,
   Text,
   TextInput,
@@ -63,6 +64,7 @@ const TodoScreen = () => {
       setTodos([...todos, newTodo]);
       setTodoText("");
       bottomSheetRef.current?.close();
+      Keyboard.dismiss();
     }
   };
 
@@ -79,25 +81,25 @@ const TodoScreen = () => {
   };
 
   const renderItem = ({ item, index }) => {
-    const renderRightActions = (progress, dragX) => {
-      return (
+    const renderRightActions = (progress, dragX) => (
+      <View style={styles.rightActionContainer}>
         <RectButton
           style={styles.deleteButton}
           onPress={() => deleteTodo(item.id)}
         >
-          <Feather name="trash-2" size={24} color="white" />
+          <Feather name="trash-2" size={24} color="#ff3b30" />
         </RectButton>
-      );
-    };
+      </View>
+    );
 
     return (
       <Swipeable
-        friction={2}
+        friction={1}
         rightThreshold={40}
         renderRightActions={renderRightActions}
-        onSwipeableOpen={() =>
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
-        }
+        onSwipeableWillOpen={() => {
+          deleteTodo(item.id);
+        }}
       >
         <TouchableOpacity
           style={[
@@ -370,15 +372,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 8,
   },
-  deleteButton: {
-    backgroundColor: "#ff3b30",
-    justifyContent: "center",
-    alignItems: "center",
-    width: 70,
-    borderRadius: 12,
-    marginVertical: 8,
-    marginRight: 15,
-  },
+
   emptyContainer: {
     flex: 1,
     justifyContent: "center",
@@ -397,6 +391,15 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 12,
     marginTop: 4,
+  },
+  rightActionContainer: {
+    justifyContent: "center",
+  },
+
+  deleteButton: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 8,
   },
 });
 

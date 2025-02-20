@@ -5,6 +5,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
@@ -14,6 +15,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { RectButton, Swipeable } from "react-native-gesture-handler";
+
 import { SafeAreaView } from "react-native-safe-area-context";
 const TodoScreen = () => {
   const [todos, setTodos] = useState([]);
@@ -70,23 +73,53 @@ const TodoScreen = () => {
       )
     );
   };
+  const deleteTodo = (id) => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    setTodos(todos.filter((todo) => todo.id !== id));
+  };
 
-  const renderItem = ({ item, index }) => (
-    <TouchableOpacity
-      style={[
-        styles.todoItem,
-        index === todos.length - 1 && styles.lastTodoItem,
-      ]}
-      onPress={() => toggleTodo(item.id)}
-    >
-      <View style={[styles.checkbox, item.completed && styles.filledCheckbox]}>
-        {item.completed && <View style={styles.innerCircle} />}
-      </View>
-      <Text style={[styles.todoText, item.completed && styles.completedText]}>
-        {item.title}
-      </Text>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item, index }) => {
+    const renderRightActions = (progress, dragX) => {
+      return (
+        <RectButton
+          style={styles.deleteButton}
+          onPress={() => deleteTodo(item.id)}
+        >
+          <Feather name="trash-2" size={24} color="white" />
+        </RectButton>
+      );
+    };
+
+    return (
+      <Swipeable
+        friction={2}
+        rightThreshold={40}
+        renderRightActions={renderRightActions}
+        onSwipeableOpen={() =>
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium)
+        }
+      >
+        <TouchableOpacity
+          style={[
+            styles.todoItem,
+            index === todos.length - 1 && styles.lastTodoItem,
+          ]}
+          onPress={() => toggleTodo(item.id)}
+        >
+          <View
+            style={[styles.checkbox, item.completed && styles.filledCheckbox]}
+          >
+            {item.completed && <Feather name="check" size={16} color="white" />}
+          </View>
+          <Text
+            style={[styles.todoText, item.completed && styles.completedText]}
+          >
+            {item.title}
+          </Text>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
 
   const getCurrentDate = () => {
     const date = new Date();
@@ -131,7 +164,18 @@ const TodoScreen = () => {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>No tasks yet!</Text>
+            <View style={styles.emptyContainer}>
+              <Feather
+                name="check-circle"
+                size={64}
+                color="#ddd"
+                style={styles.emptyIcon}
+              />
+              <Text style={styles.emptyText}>No tasks yet!</Text>
+              <Text style={[styles.emptyText, { fontSize: 14 }]}>
+                Swipe left on tasks to delete them
+              </Text>
+            </View>
           }
         />
         <TouchableOpacity
@@ -147,20 +191,26 @@ const TodoScreen = () => {
           snapPoints={snapPoints}
           enablePanDownToClose
           backdropComponent={renderBackdrop}
-          keyboardBehavior="extend"
+          keyboardBlurBehavior="restore" // Restores position when keyboard dismisses
+          keyboardBehavior="interactive"
           handleStyle={styles.handle} // Add handle styling
           backgroundStyle={styles.background}
           handleIndicatorStyle={styles.handleIndicator}
         >
           <BottomSheetView style={styles.bottomSheetContent}>
             <Text style={styles.bottomSheetTitle}>New Task</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter new todo..."
-              value={todoText}
-              onChangeText={setTodoText}
-              autoFocus
-            />
+            <View style={styles.inputContainer}>
+              <TextInput
+                style={styles.input}
+                placeholder="Enter new todo..."
+                value={todoText}
+                onChangeText={setTodoText}
+                autoFocus
+                maxLength={60}
+                multiline
+              />
+              <Text style={styles.charCounter}>{todoText.length}/60</Text>
+            </View>
             <TouchableOpacity
               style={styles.bottomSheetButton}
               onPress={addTodo}
@@ -288,7 +338,6 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 12,
     padding: 16,
-    marginBottom: 20,
     fontSize: 16,
   },
   bottomSheetButton: {
@@ -320,6 +369,34 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
     width: 80,
     height: 8,
+  },
+  deleteButton: {
+    backgroundColor: "#ff3b30",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 70,
+    borderRadius: 12,
+    marginVertical: 8,
+    marginRight: 15,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 60,
+  },
+  emptyIcon: {
+    opacity: 0.3,
+    marginBottom: 16,
+  },
+  inputContainer: {
+    marginBottom: 16,
+  },
+  charCounter: {
+    textAlign: "right",
+    color: "#888",
+    fontSize: 12,
+    marginTop: 4,
   },
 });
 

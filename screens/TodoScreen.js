@@ -128,12 +128,12 @@ const TodoScreen = () => {
 const styles = StyleSheet.create({
   dateText: {
     fontSize: 28,
-    fontWeight: "bold",
+    fontWeight: "800",
   },
   monthText: {
     color: "gray",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   dateContainer: {
     flexDirection: "column",
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 36,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 
   todoItem: {
@@ -193,7 +193,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   todoText: {
-    fontSize: 18,
+    fontSize: 20,
+    fontWeight: "600",
   },
   completedText: {
     textDecorationLine: "line-through",

@@ -63,9 +63,12 @@ const TodoScreen = () => {
     );
   };
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item , index}) => (
     <TouchableOpacity
-      style={styles.todoItem}
+      style={[
+        styles.todoItem,
+        index === todos.length - 1 && styles.lastTodoItem, // Remove border for last item
+      ]}
       onPress={() => toggleTodo(item.id)}
     >
       <View style={[styles.checkbox, item.completed && styles.filledCheckbox]}>
@@ -172,6 +175,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
     alignItems: "center",
+  },
+  lastTodoItem: {
+    borderBottomWidth: 0, // Remove border for last item
   },
   checkbox: {
     width: 24,

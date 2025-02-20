@@ -1,5 +1,6 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import SettingsScreen from "./screens/SettingsScreen";
 import TodoScreen from "./screens/TodoScreen";
 
 const Stack = createStackNavigator();
@@ -28,6 +29,7 @@ export default function App() {
         }}
       >
         <Stack.Screen name="Todo" component={TodoScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

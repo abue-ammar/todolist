@@ -5,6 +5,7 @@ import BottomSheet, {
   BottomSheetView,
 } from "@gorhom/bottom-sheet";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
@@ -23,12 +24,14 @@ const TodoScreen = () => {
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState("");
   const bottomSheetRef = useRef(null);
+  const navigation = useNavigation();
   const snapPoints = ["20%", "40%"];
 
-  // Load todos from storage when component mounts
-  useEffect(() => {
-    loadTodos();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadTodos();
+    }, [])
+  );
 
   // Save todos to storage whenever they change
   useEffect(() => {

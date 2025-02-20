@@ -16,8 +16,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { RectButton, Swipeable } from "react-native-gesture-handler";
-
+import { RectButton } from "react-native-gesture-handler";
+import Swipeable from "react-native-gesture-handler/ReanimatedSwipeable";
 import { SafeAreaView } from "react-native-safe-area-context";
 const TodoScreen = () => {
   const [todos, setTodos] = useState([]);
@@ -95,7 +95,7 @@ const TodoScreen = () => {
     return (
       <Swipeable
         friction={1}
-        rightThreshold={40}
+        rightThreshold={100}
         renderRightActions={renderRightActions}
         onSwipeableWillOpen={() => {
           deleteTodo(item.id);
@@ -208,10 +208,10 @@ const TodoScreen = () => {
                 value={todoText}
                 onChangeText={setTodoText}
                 autoFocus
-                maxLength={60}
+                maxLength={36}
                 multiline
               />
-              <Text style={styles.charCounter}>{todoText.length}/60</Text>
+              <Text style={styles.charCounter}>{todoText.length}/36</Text>
             </View>
             <TouchableOpacity
               style={styles.bottomSheetButton}

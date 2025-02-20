@@ -81,39 +81,19 @@ const TodoScreen = () => {
     const date = new Date();
     const day = date.getDate();
     const month = date.toLocaleString("default", { month: "short" });
-    return `${day} ${month}`;
+    // return `${day} ${month}`;
+    return (
+      <View style={styles.dateContainer}>
+        <Text style={styles.dateText}>{day}</Text>
+        <Text style={styles.monthText}>{month}</Text>
+      </View>
+    );
   };
 
   return (
-    // <SafeAreaView style={styles.safeArea}>
-    //   <View style={styles.container}>
-    //     <Text style={styles.header}>Today</Text>
-    //     <Text style={styles.date}>31 Oct</Text>
-
-    //     <FlatList
-    //       data={todos}
-    //       renderItem={renderItem}
-    //       keyExtractor={(item) => item.id}
-    //       ListEmptyComponent={
-    //         <Text style={styles.emptyText}>No todos yet!</Text>
-    //       }
-    //     />
-
-    //     <TouchableOpacity
-    //       style={styles.addButton}
-    //       onPress={() => navigation.navigate("AddTodo", { addTodo })}
-    //     >
-    //       <Text style={styles.addButtonText}>+</Text>
-    //     </TouchableOpacity>
-    //   </View>
-    // </SafeAreaView>
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View>
-            <Text style={styles.header}>Today</Text>
-            <Text style={styles.date}>{getCurrentDate()}</Text>
-          </View>
+        <View style={styles.settingsIcon}>
           <TouchableOpacity onPress={() => navigation.navigate("Settings")}>
             <MaterialCommunityIcons
               name="dots-horizontal"
@@ -121,6 +101,10 @@ const TodoScreen = () => {
               color="black"
             />
           </TouchableOpacity>
+        </View>
+        <View style={styles.headerContainer}>
+          <Text style={styles.header}>Today</Text>
+          {getCurrentDate()}
         </View>
         <FlatList
           data={todos}
@@ -142,6 +126,25 @@ const TodoScreen = () => {
 };
 
 const styles = StyleSheet.create({
+  dateText: {
+    fontSize: 28,
+    fontWeight: "bold",
+  },
+  monthText: {
+    color: "gray",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  dateContainer: {
+    flexDirection: "column",
+    justifyContent: "center",
+    alignContent: "center",
+  },
+  settingsIcon: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    marginBottom: 10,
+  },
   safeArea: {
     flex: 1,
     backgroundColor: "white",
@@ -159,13 +162,10 @@ const styles = StyleSheet.create({
     marginBottom: 15, // More spacing
   },
   header: {
-    fontSize: 32,
-    fontWeight: "bold",
+    fontSize: 36,
+    fontWeight: "700",
   },
-  date: {
-    fontSize: 18,
-    color: "gray",
-  },
+
   todoItem: {
     flexDirection: "row",
     paddingVertical: 15,

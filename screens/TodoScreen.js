@@ -134,7 +134,11 @@ const TodoScreen = () => {
       </View>
     );
   };
-
+  const handleSheetChange = (index) => {
+    if (index === -1) {
+      Keyboard.dismiss();
+    }
+  };
   const renderBackdrop = useCallback(
     (props) => (
       <BottomSheetBackdrop
@@ -190,6 +194,7 @@ const TodoScreen = () => {
         <BottomSheet
           ref={bottomSheetRef}
           index={-1}
+          onChange={handleSheetChange}
           snapPoints={snapPoints}
           enablePanDownToClose
           backdropComponent={renderBackdrop}
@@ -207,7 +212,6 @@ const TodoScreen = () => {
                 placeholder="Enter new todo..."
                 value={todoText}
                 onChangeText={setTodoText}
-                autoFocus
                 maxLength={36}
                 multiline
               />
